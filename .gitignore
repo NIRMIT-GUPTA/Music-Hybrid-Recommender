@@ -1,0 +1,6 @@
+__pycache__/
+.pytest_cache/
+.streamlit/
+models/*.joblib
+data/processed/*.parquet
+data/interactions/*.npz
