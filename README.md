@@ -195,7 +195,7 @@ python scripts\generate_demo_interactions.py
 python scripts\train_models.py
 streamlit run streamlit_app.py
 ```
-
+deployed streamlit UI https://music-hybrid-recommender-model.streamlit.app/
 The raw dataset must be available at `data/raw/dataset.csv`.
 
 If PowerShell blocks virtual-environment activation, run:
