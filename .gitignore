@@ -1,6 +1,11 @@
 __pycache__/
+*.pyc
 .pytest_cache/
 .streamlit/
+.venv/
+db.sqlite3
 models/*.joblib
+models/evaluation_metrics.csv
+models/evaluation_chart.png
 data/processed/*.parquet
 data/interactions/*.npz

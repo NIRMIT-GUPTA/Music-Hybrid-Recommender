@@ -3,7 +3,8 @@
 A music recommendation system that returns the top 10 tracks from one
 input: a selected song or a selected genre. It combines content-based
 similarity with item-item collaborative filtering and presents
-recommendations through a Streamlit interface.
+recommendations through a Streamlit interface and a Django web
+application.
 
 ## Overview
 
@@ -17,10 +18,10 @@ The system uses two recommendation engines:
 
 -   **Hybrid ranking** combines the normalized scores from both engines:
 
-    \[ `\text{Hybrid Score}`{=tex} =
-    `\alpha `{=tex}`\times `{=tex}`\text{Normalized Content Score}`{=tex} +
-    (1-`\alpha`{=tex})
-    `\times `{=tex}`\text{Normalized Collaborative Score}`{=tex} \]
+    \\[ `\\text{Hybrid Score}`{=tex} =
+    `\\alpha `{=tex}`\\times `{=tex}`\\text{Normalized Content Score}`{=tex} +
+    (1-`\\alpha`{=tex})
+    `\\times `{=tex}`\\text{Normalized Collaborative Score}`{=tex} \\]
 
 The current hybrid recommender uses `alpha=0.5` by default. The
 optimization script tests alpha values from `0.0` to `1.0` in increments
@@ -75,8 +76,13 @@ Processed track catalog (Parquet)
                  Normalize and combine
                     content + CF scores
                           |
-                          v
-                 Streamlit top-10 results
+              +-----------+-----------+
+              |                       |
+              v                       v
+   Streamlit top-10 results   Django web application
+                              (search, recommend,
+                               favourites, history,
+                               user accounts)
 ```
 
 The application supports two recommendation modes:
@@ -98,13 +104,14 @@ Music-Hybrid-Recommender/
 │   ├── raw/
 │   │   └── dataset.csv
 │   ├── processed/
-│   │   └── tracks.parquet
+│   │   └── tracks.parquet          (generated)
 │   └── interactions/
-│       └── synthetic_interactions.npz
+│       └── synthetic_interactions.npz (generated)
 ├── models/
-│   ├── content.joblib
-│   ├── collaborative.joblib
+│   ├── content.joblib              (generated)
+│   └── collaborative.joblib        (generated)
 ├── recommender/
+│   ├── __init__.py
 │   ├── preprocessing.py
 │   ├── content_based.py
 │   ├── collaborative.py
@@ -116,9 +123,38 @@ Music-Hybrid-Recommender/
 │   ├── train_models.py
 │   ├── optimize_hybrid.py
 │   └── evaluate_models.py
+├── config/                         (Django project settings)
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── wsgi.py
+│   └── asgi.py
+├── musicapp/                       (Django app)
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── engine.py
+│   ├── forms.py
+│   ├── models.py
+│   ├── urls.py
+│   ├── views.py
+│   ├── migrations/
+│   │   ├── __init__.py
+│   │   ├── 0001_initial.py
+│   │   └── 0002_user_profiles.py
+│   ├── static/musicapp/
+│   │   ├── css/style.css
+│   │   └── js/app.js
+│   └── templates/
+│       ├── base.html
+│       ├── musicapp/index.html
+│       └── registration/
+│           ├── login.html
+│           └── signup.html
+├── manage.py
 ├── streamlit_app.py
 ├── requirements.txt
-└── README.md
+├── README.md
 ```
 
 Generated files appear after running the relevant scripts. The `models/`
@@ -186,17 +222,13 @@ NDCG@K, catalogue coverage, and recommendation diversity.
 The commands below are for Windows PowerShell. Run them from the project
 root.
 
+### 1. Environment Setup
+
 ``` powershell
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-python scripts\prepare_data.py
-python scripts\generate_demo_interactions.py
-python scripts\train_models.py
-streamlit run streamlit_app.py
 ```
-deployed streamlit UI https://music-hybrid-recommender-model.streamlit.app/
-The raw dataset must be available at `data/raw/dataset.csv`.
 
 If PowerShell blocks virtual-environment activation, run:
 
@@ -205,8 +237,56 @@ Set-ExecutionPolicy -Scope Process Bypass
 .\.venv\Scripts\Activate.ps1
 ```
 
+### 2. Build the Recommender Models (required before either frontend)
+
+The raw dataset must be available at `data/raw/dataset.csv`.
+
+``` powershell
+python scripts\prepare_data.py
+python scripts\generate_demo_interactions.py
+python scripts\train_models.py
+```
+
 The first model-building run may take a few minutes while the full
 catalog is processed.
+
+### 3a. Run the Streamlit Interface
+
+``` powershell
+streamlit run streamlit_app.py
+```
+
+### 3b. Run the Django Web Application
+
+``` powershell
+python manage.py migrate
+python manage.py runserver
+```
+
+Then open `http://127.0.0.1:8000/`. See [WEB_README.md](WEB_README.md)
+for full details about the web application.
+
+## Django Web Application
+
+The Django frontend provides a full-featured web interface on top of the
+same hybrid recommendation engine used by the Streamlit app.
+
+**Features:**
+
+-   **Song search** with live autocomplete across track names and
+    artists
+-   **Genre browsing** with a complete genre list from the catalog
+-   **Hybrid recommendations** with an adjustable alpha slider
+-   **User accounts** with sign-up, login, and logout
+-   **Favourites** — save and unsave songs (requires an account)
+-   **Search history** — recent recommendation queries are stored per
+    user
+
+The web app loads the trained ML models (`models/content.joblib`,
+`models/collaborative.joblib`) and the processed track catalog
+(`data/processed/tracks.parquet`) lazily on the first request. The
+recommender pipeline scripts in Step 2 above must be run before starting
+the Django server.
 
 ## Optional Evaluation and Tuning
 
