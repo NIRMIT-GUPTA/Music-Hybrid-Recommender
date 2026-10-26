@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <section class="card shadow-sm"><div class="card-body p-4">
+      <h1 class="h3">Find your next track</h1><p class="text-secondary">Blend content similarity with collaborative signals.</p>
+      <div class="btn-group mb-3" role="group"><input type="radio" class="btn-check" name="mode" id="song-mode" value="song" checked><label class="btn btn-outline-info" for="song-mode">Recommend by Song</label><input type="radio" class="btn-check" name="mode" id="genre-mode" value="genre"><label class="btn btn-outline-info" for="genre-mode">Recommend by Genre</label></div>
+      <div id="song-input" class="position-relative mb-3"><label class="form-label" for="song-search">Search for a song or artist</label><input id="song-search" class="form-control" autocomplete="off" placeholder="Start typing…"><input type="hidden" id="selected-track-id"><div id="suggestions" class="list-group position-absolute w-100 shadow"></div></div>
+      <div id="genre-input" class="mb-3 d-none"><label class="form-label" for="genre-select">Choose a genre</label><select id="genre-select" class="form-select"><option value="">Loading genres…</option></select></div>
+      <label class="form-label" for="alpha">Content weight: <span id="alpha-value">0.6</span></label><input id="alpha" class="form-range" type="range" min="0" max="1" step="0.1" value="0.6">
+      <button id="recommend-button" class="btn btn-info mt-3"><span class="spinner-border spinner-border-sm d-none" role="status"></span> Recommend Songs</button><div id="message" class="mt-3"></div>
+    </div></section>
+    <section class="card shadow-sm mt-4"><div class="card-body"><h2 class="h4">Recommendations</h2><div class="table-responsive"><table class="table table-dark table-hover align-middle mb-0"><thead><tr><th>Song</th><th>Artist</th><th>Genre</th><th>Popularity</th><th>Content</th><th>Collaborative</th><th>Hybrid</th><th></th></tr></thead><tbody id="results"><tr><td colspan="8" class="text-secondary text-center">Choose a song or genre to begin.</td></tr></tbody></table></div></div></section>
+  </div>
+  <aside class="col-lg-4"><div class="card shadow-sm mb-4"><div class="card-body"><h2 class="h5">My Favourites</h2><div id="favourites" class="small text-secondary">No saved favourites yet.</div></div></div><div class="card shadow-sm"><div class="card-body"><h2 class="h5">Recent Searches</h2><div id="history" class="small text-secondary">No recent searches yet.</div></div></div></aside>
+</div>
+{% endblock %}

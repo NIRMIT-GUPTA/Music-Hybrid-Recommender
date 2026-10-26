@@ -1,0 +1,12 @@
+:root { --bs-body-bg: #10151f; --bs-body-color: #e8edf5; }
+body { background: radial-gradient(circle at top right, #1b3345, #10151f 45%); min-height: 100vh; }
+.card { background: #18212d; border: 1px solid #2b3b4d; }
+.form-control, .form-select { background: #111923; border-color: #405268; color: #eef5fb; }
+.form-control:focus, .form-select:focus { background: #111923; color: #fff; border-color: #4cc9f0; box-shadow: 0 0 0 .2rem rgba(76,201,240,.15); }
+#suggestions { z-index: 10; max-height: 260px; overflow-y: auto; }
+#suggestions .list-group-item { background: #1d2a38; border-color: #34475b; color: #e8edf5; cursor: pointer; }
+#suggestions .list-group-item:hover { background: #273b4f; }
+.result-heart { font-size: 1.2rem; line-height: 1; }
+.history-item, .favourite-item { cursor: pointer; }
+.card input:not([type="range"]), .card select { width: 100%; padding: .375rem .75rem; border-radius: .375rem; }
+.form-text { color: #9eafc0; }
